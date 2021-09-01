@@ -1,2 +1,3 @@
 rootProject.name = "Location Tracker"
 include ':app'
+include ':base'

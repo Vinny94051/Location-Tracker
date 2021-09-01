@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Base</string>
+
+    <!--    Errors-->
+    <string name="error_user_not_found">User not found</string>
+    <string name="link_is_invalid">Link is invalid.</string>
+
+</resources>
