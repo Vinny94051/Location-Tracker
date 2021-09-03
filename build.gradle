@@ -14,13 +14,15 @@ buildscript {
 
         room_version = "2.3.0"
 
-        coroutines_version = "1.5.20"
+        coroutines_version = "1.5.0"
 
         glide_version = "4.11.0"
 
         recycler_version = "1.2.1"
 
-        material_version = "1.5.0-alpha03"
+        material_version = "1.4.0"
+
+        google_play_services_version = "18.0.0"
     }
 }
 
