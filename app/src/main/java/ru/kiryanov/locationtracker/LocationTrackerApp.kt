@@ -1,9 +1,8 @@
 package ru.kiryanov.locationtracker
 
 import android.app.Application
-import android.content.Context
-import ru.kiryanov.locationtracker.dagger.AppComponent
-import ru.kiryanov.locationtracker.dagger.DaggerAppComponent
+import ru.kiryanov.locationtracker.di.AppComponent
+import ru.kiryanov.locationtracker.di.DaggerAppComponent
 
 class LocationTrackerApp : Application() {
 
@@ -16,7 +15,7 @@ class LocationTrackerApp : Application() {
         initDagger()
     }
 
-    fun initDagger() {
+   private fun initDagger() {
         appComponent = DaggerAppComponent.builder()
             .context(context = this)
             .build()

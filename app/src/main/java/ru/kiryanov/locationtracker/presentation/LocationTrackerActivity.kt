@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityCompat
 import ru.kiryanov.locationtracker.utils.location.LocationResult
@@ -15,6 +16,7 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_location_tracker.*
 import ru.kiryanov.locationtracker.LocationTrackerApp
 import ru.kiryanov.locationtracker.R
+import ru.kiryanov.locationtracker.domain.DomainLocation
 import vlnny.base.ext.showToast
 import vlnny.base.permissions.PermissionsManager
 
@@ -35,6 +37,12 @@ class LocationTrackerActivity : BaseActivity() {
         }
     }
 
+    private val locationsObserver by lazy {
+        Observer<List<DomainLocation>> { locations ->
+            Log.e("!!!LOCATIONS: ", locations.toString())
+        }
+    }
+
     override fun layoutId() = R.layout.activity_location_tracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,12 +54,14 @@ class LocationTrackerActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.location.observe(this, locationObserver)
+        viewModel.locations.observe(this, locationsObserver)
         initViews()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         viewModel.location.removeObserver(locationObserver)
+        viewModel.locations.removeObserver(locationsObserver)
     }
 
     private fun initViews() {

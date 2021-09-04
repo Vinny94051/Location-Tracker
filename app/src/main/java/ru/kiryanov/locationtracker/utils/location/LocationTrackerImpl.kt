@@ -48,7 +48,13 @@ class LocationTrackerImpl @Inject constructor(private val context: Context) : Lo
     ) {
         if (task.isSuccessful) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                listener.invoke(LocationResult.Success(location = location))
+                listener.invoke(
+                    if (location == null) {
+                        LocationResult.Failure(error = LocationError.Unknown)
+                    } else {
+                        LocationResult.Success(location = location)
+                    }
+                )
             }
         }
     }

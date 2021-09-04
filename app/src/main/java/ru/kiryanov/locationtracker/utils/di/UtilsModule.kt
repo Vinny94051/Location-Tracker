@@ -1,4 +1,4 @@
-package ru.kiryanov.locationtracker.dagger
+package ru.kiryanov.locationtracker.utils.di
 
 import dagger.Binds
 import dagger.Module
