@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppCompatTextView.Item.Location" parent="">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#9c64a6</item>
+    </style>
+
+    <style name="AppCompatTextView.Item.Location.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

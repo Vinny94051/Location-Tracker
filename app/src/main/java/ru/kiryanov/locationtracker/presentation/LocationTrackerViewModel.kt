@@ -22,24 +22,20 @@ class LocationTrackerViewModel @Inject constructor(
     private val getLocationsListUseCase: GetLocationsListUseCase
 ) : BaseViewModel() {
 
-    private val _location = MutableLiveData<LocationResult>()
-    val location: LiveData<LocationResult> get() = _location
-
     private val _locations = MutableLiveData<List<DomainLocation>>()
     val locations: LiveData<List<DomainLocation>> get() = _locations
 
     init {
-        getLocations()
+        initLocationTracker()
     }
 
     fun initLocationTracker() {
         locationTracker.setLocationListener { locationResult ->
             saveLocation(locationResult)
-            _location.value = locationResult
         }
     }
 
-    private fun getLocations() {
+    fun getLocations() {
         viewModelScope.launch {
             _locations.value = getLocationsListUseCase
                 .getLocationsList()

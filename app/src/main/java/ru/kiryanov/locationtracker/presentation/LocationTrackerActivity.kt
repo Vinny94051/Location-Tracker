@@ -1,15 +1,8 @@
 package ru.kiryanov.locationtracker.presentation
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
-import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
-import android.util.Log
-import android.view.View
-import androidx.core.app.ActivityCompat
-import ru.kiryanov.locationtracker.utils.location.LocationResult
 import vlnny.base.activity.BaseActivity
 import javax.inject.Inject
 import androidx.lifecycle.Observer
@@ -17,7 +10,8 @@ import kotlinx.android.synthetic.main.activity_location_tracker.*
 import ru.kiryanov.locationtracker.LocationTrackerApp
 import ru.kiryanov.locationtracker.R
 import ru.kiryanov.locationtracker.domain.DomainLocation
-import vlnny.base.ext.showToast
+import ru.kiryanov.locationtracker.presentation.list.LocationHistoryAdapter
+import vlnny.base.ext.hideActionBar
 import vlnny.base.permissions.PermissionsManager
 
 class LocationTrackerActivity : BaseActivity() {
@@ -28,24 +22,18 @@ class LocationTrackerActivity : BaseActivity() {
     @Inject
     lateinit var permissionManager: PermissionsManager
 
-    private val locationObserver by lazy {
-        Observer<LocationResult> { locationResult ->
-            when (locationResult) {
-                is LocationResult.Success -> showLocation(locationResult.location)
-                is LocationResult.Failure -> showToast(locationResult.error.toString())
-            }
-        }
-    }
+    private val adapter by lazy { LocationHistoryAdapter() }
 
     private val locationsObserver by lazy {
         Observer<List<DomainLocation>> { locations ->
-            Log.e("!!!LOCATIONS: ", locations.toString())
+            adapter.updateList(locations)
         }
     }
 
     override fun layoutId() = R.layout.activity_location_tracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        hideActionBar()
         super.onCreate(savedInstanceState)
         LocationTrackerApp.appComponent.inject(this)
         loadLocation()
@@ -53,19 +41,19 @@ class LocationTrackerActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.location.observe(this, locationObserver)
-        viewModel.locations.observe(this, locationsObserver)
         initViews()
+        viewModel.locations.observe(this, locationsObserver)
+        viewModel.getLocations()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.location.removeObserver(locationObserver)
         viewModel.locations.removeObserver(locationsObserver)
     }
 
     private fun initViews() {
         updateLocationInfo.setOnClickListener { loadLocation() }
+        locationsList.adapter = adapter
     }
 
     private fun loadLocation() {
@@ -90,9 +78,4 @@ class LocationTrackerActivity : BaseActivity() {
             .setPositiveButton("ОК", action)
             .setCancelable(false)
             .create()
-
-    private fun showLocation(location: Location) {
-        val locationText = "latitude: ${location.latitude}\nlongitude: ${location.longitude}"
-        locationTextView.text = locationText
-    }
 }
