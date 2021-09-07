@@ -1,8 +1,9 @@
 package ru.kiryanov.locationtracker.presentation
 
 import android.app.AlertDialog
-import android.content.DialogInterface
+import android.content.*
 import android.os.Bundle
+import android.os.IBinder
 import vlnny.base.activity.BaseActivity
 import javax.inject.Inject
 import androidx.lifecycle.Observer
@@ -11,7 +12,9 @@ import ru.kiryanov.locationtracker.LocationTrackerApp
 import ru.kiryanov.locationtracker.R
 import ru.kiryanov.locationtracker.domain.DomainLocation
 import ru.kiryanov.locationtracker.presentation.list.LocationHistoryAdapter
+import ru.kiryanov.locationtracker.utils.location.LocationService
 import vlnny.base.ext.hideActionBar
+import vlnny.base.ext.showSnack
 import vlnny.base.permissions.PermissionsManager
 
 class LocationTrackerActivity : BaseActivity() {
@@ -30,6 +33,26 @@ class LocationTrackerActivity : BaseActivity() {
         }
     }
 
+    private var foregroundOnlyLocationServiceBound = false
+
+    // Provides location updates for while-in-use feature.
+    private var locationService: LocationService? = null
+
+    // Monitors connection to the while-in-use service.
+    private val serviceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            val binder = service as LocationService.LocalBinder
+            locationService = binder.service
+            foregroundOnlyLocationServiceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            locationService = null
+            foregroundOnlyLocationServiceBound = false
+        }
+    }
+
     override fun layoutId() = R.layout.activity_location_tracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +66,9 @@ class LocationTrackerActivity : BaseActivity() {
         super.onStart()
         initViews()
         viewModel.locations.observe(this, locationsObserver)
-        viewModel.getLocations()
+        val serviceIntent = Intent(this, LocationService::class.java)
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+        locationService?.subscribeLocationUpdates()
     }
 
     override fun onDestroy() {
@@ -52,7 +77,10 @@ class LocationTrackerActivity : BaseActivity() {
     }
 
     private fun initViews() {
-        updateLocationInfo.setOnClickListener { loadLocation() }
+        updateLocationInfo.setOnClickListener {
+            loadLocation()
+            viewModel.getLocations()
+        }
         locationsList.adapter = adapter
     }
 
@@ -62,11 +90,11 @@ class LocationTrackerActivity : BaseActivity() {
                 createAlertDialog { _, _ ->
                     checkLocationPermissions(this@LocationTrackerActivity)
                     if (isLocationPermissionsGranted(this@LocationTrackerActivity)) {
-                        viewModel.initLocationTracker()
+                        showSnack(headTextView, "Permissions now is granted")
                     }
                 }.show()
             } else {
-                viewModel.initLocationTracker()
+                showSnack(headTextView, "Permissions was granted")
             }
         }
     }

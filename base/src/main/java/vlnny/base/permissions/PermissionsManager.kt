@@ -8,7 +8,7 @@ import android.app.Activity
 interface PermissionsManager {
 
     companion object {
-        const val PERMISSION_REQUEST_CODE_LOCATION= 1111
+        const val PERMISSION_REQUEST_CODE_LOCATION = 1111
     }
 
     fun checkLocationPermissions(activity: Activity)

@@ -2,9 +2,10 @@ package ru.kiryanov.locationtracker.utils.location
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Looper
 import android.util.Log
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.location.LocationResult as GoogleLocationResult
 import com.google.android.gms.tasks.Task
 import java.lang.Exception
 import javax.inject.Inject
@@ -40,6 +41,34 @@ class LocationTrackerImpl @Inject constructor(private val context: Context) : Lo
         task.continueWith { _task -> taskContinueWith(_task, listener) }
         task.addOnFailureListener { exception -> taskOnFailureAction(exception, listener) }
     }
+
+    private var locationCallback: LocationCallback? = null
+
+    @SuppressLint("MissingPermission")
+    override fun startLocationUpdates(listener: (LocationResult) -> Unit) {
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: GoogleLocationResult) {
+                super.onLocationResult(locationResult)
+                listener.invoke(LocationResult.Success(location = locationResult.lastLocation))
+            }
+        }
+
+        locationCallback?.let { notNullCallback ->
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                notNullCallback,
+                Looper.getMainLooper()
+            )
+        }
+    }
+
+    override fun stopLocationUpdates() {
+        locationCallback?.let { notNullCallback ->
+            fusedLocationClient.removeLocationUpdates(notNullCallback)
+        }
+    }
+
 
     @SuppressLint("MissingPermission")
     private fun taskContinueWith(
