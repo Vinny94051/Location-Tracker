@@ -5,5 +5,6 @@
     <string name="start_location_updates_button_text">Start receiving location updates</string>
     <string name="stop_location_updates_button_text">Stop receiving location updates</string>
     <string name="launch_activity">Launch activity</string>
-    <string name="no_location_text">Location not found</string>
+    <string name="no_location_text">Cannot define location</string>
+    <string name="no_date_text">Cannot define date</string>
 </resources>

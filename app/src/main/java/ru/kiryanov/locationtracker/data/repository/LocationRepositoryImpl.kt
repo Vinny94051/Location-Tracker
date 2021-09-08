@@ -1,5 +1,6 @@
 package ru.kiryanov.locationtracker.data.repository
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.kiryanov.locationtracker.data.database.dao.LocationDao
@@ -21,7 +22,8 @@ class LocationRepositoryImpl @Inject constructor(private val locationDao: Locati
     }
 
     override suspend fun saveLocation(location: DomainLocation) {
-        withContext(Dispatchers.IO) {
+        Log.e("Save: ", "$location")
+        withContext(Dispatchers.Default){
             locationDao.insertAll(location.toLocationEntity())
         }
     }

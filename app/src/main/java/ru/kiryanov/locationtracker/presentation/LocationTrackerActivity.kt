@@ -16,7 +16,15 @@ import ru.kiryanov.locationtracker.utils.location.LocationService
 import vlnny.base.ext.hideActionBar
 import vlnny.base.ext.showSnack
 import vlnny.base.permissions.PermissionsManager
-
+// TODO: ("
+//  1. К Бд прикрутить Flow
+//  2. Более видный чек бокс
+//  3. Преф менеджер мало-мальский
+//  4. Вынести строки в ресурсы
+//  5. Дименсы в ресурсы
+//  6. Вынести create алерта?
+//  7. Пройтись по LocationTracker
+//  ")
 class LocationTrackerActivity : BaseActivity() {
 
     @Inject
@@ -27,29 +35,24 @@ class LocationTrackerActivity : BaseActivity() {
 
     private val adapter by lazy { LocationHistoryAdapter() }
 
+    private val prefs by lazy { getSharedPreferences(PREFS, Context.MODE_PRIVATE) }
+
     private val locationsObserver by lazy {
         Observer<List<DomainLocation>> { locations ->
             adapter.updateList(locations)
         }
     }
 
-    private var foregroundOnlyLocationServiceBound = false
-
-    // Provides location updates for while-in-use feature.
     private var locationService: LocationService? = null
 
-    // Monitors connection to the while-in-use service.
     private val serviceConnection = object : ServiceConnection {
-
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             val binder = service as LocationService.LocalBinder
             locationService = binder.service
-            foregroundOnlyLocationServiceBound = true
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
             locationService = null
-            foregroundOnlyLocationServiceBound = false
         }
     }
 
@@ -59,16 +62,24 @@ class LocationTrackerActivity : BaseActivity() {
         hideActionBar()
         super.onCreate(savedInstanceState)
         LocationTrackerApp.appComponent.inject(this)
-        loadLocation()
+
+        checkLocationPermissions()
+        bindLocationService()
     }
 
     override fun onStart() {
         super.onStart()
         initViews()
-        viewModel.locations.observe(this, locationsObserver)
-        val serviceIntent = Intent(this, LocationService::class.java)
-        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-        locationService?.subscribeLocationUpdates()
+
+        with(viewModel) {
+            locations.observe(this@LocationTrackerActivity, locationsObserver)
+            getLocations()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        locationService?.unbindService(serviceConnection)
     }
 
     override fun onDestroy() {
@@ -77,14 +88,21 @@ class LocationTrackerActivity : BaseActivity() {
     }
 
     private fun initViews() {
-        updateLocationInfo.setOnClickListener {
-            loadLocation()
-            viewModel.getLocations()
+        updateLocationInfo.setOnClickListener { viewModel.getLocations() }
+        locationsTracking.isChecked = isServiceActive()
+        locationsTracking.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                locationService?.subscribeLocationUpdates()
+                updateIsSubscribedFlag(true)
+            } else {
+                locationService?.unsubscribeLocationUpdates()
+                updateIsSubscribedFlag(false)
+            }
         }
         locationsList.adapter = adapter
     }
 
-    private fun loadLocation() {
+    private fun checkLocationPermissions() {
         with(permissionManager) {
             if (!isLocationPermissionsGranted(this@LocationTrackerActivity)) {
                 createAlertDialog { _, _ ->
@@ -93,11 +111,23 @@ class LocationTrackerActivity : BaseActivity() {
                         showSnack(headTextView, "Permissions now is granted")
                     }
                 }.show()
-            } else {
-                showSnack(headTextView, "Permissions was granted")
             }
         }
     }
+
+    private fun bindLocationService() {
+        val serviceIntent = Intent(this, LocationService::class.java)
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun updateIsSubscribedFlag(isSubscribed: Boolean) {
+        prefs
+            .edit()
+            .putBoolean(IS_SUBSCRIBED, isSubscribed)
+            .apply()
+    }
+
+    private fun isServiceActive() = prefs.getBoolean(IS_SUBSCRIBED, false)
 
     private fun createAlertDialog(action: DialogInterface.OnClickListener) =
         AlertDialog.Builder(this)
@@ -106,4 +136,10 @@ class LocationTrackerActivity : BaseActivity() {
             .setPositiveButton("ОК", action)
             .setCancelable(false)
             .create()
+
+    companion object {
+        private const val PREFS = "ru.kiryanov.prefs"
+
+        private const val IS_SUBSCRIBED = "ru.kiryanov.is.subscribed"
+    }
 }

@@ -10,10 +10,8 @@ import ru.kiryanov.locationtracker.domain.usecase.GetLocationsListUseCase
 import ru.kiryanov.locationtracker.domain.usecase.SaveLocationUseCase
 import ru.kiryanov.locationtracker.utils.location.LocationResult
 import ru.kiryanov.locationtracker.utils.location.LocationTracker
-import vlnny.base.ext.currentDate
-import vlnny.base.ext.toDate
 import vlnny.base.viewModel.BaseViewModel
-import java.time.LocalDateTime
+import java.util.*
 import javax.inject.Inject
 
 class LocationTrackerViewModel @Inject constructor(
@@ -24,12 +22,6 @@ class LocationTrackerViewModel @Inject constructor(
 
     private val _locations = MutableLiveData<List<DomainLocation>>()
     val locations: LiveData<List<DomainLocation>> get() = _locations
-
-    fun initLocationTracker() {
-        locationTracker.startLocationUpdates { locationResult ->
-            saveLocation(locationResult)
-        }
-    }
 
     fun getLocations() {
         viewModelScope.launch {
@@ -52,7 +44,7 @@ fun LocationResult.toDomainLocation(): DomainLocation? {
     return when (this) {
         is LocationResult.Success -> DomainLocation(
             location = this.location,
-            date = currentDate.toDate()
+            date = Calendar.getInstance().time
         )
         else -> null
     }

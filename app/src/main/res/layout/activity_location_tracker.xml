@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/locationsList"
@@ -35,10 +35,21 @@
 
     <Button
         android:id="@+id/updateLocationInfo"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_margin="@dimen/default_margin"
+        android:padding="4dp"
         android:background="@drawable/ic_baseline_refresh_24"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toBottomOf="@id/headTextView"
+        app:layout_constraintEnd_toStartOf="@id/locationsTracking"
+        app:layout_constraintTop_toTopOf="@id/headTextView" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/locationsTracking"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="@dimen/default_margin"
         app:layout_constraintBottom_toBottomOf="@id/headTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/headTextView" />
