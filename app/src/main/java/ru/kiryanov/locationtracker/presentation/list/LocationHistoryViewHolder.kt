@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.item_location_history.view.*
 import ru.kiryanov.locationtracker.R
 import ru.kiryanov.locationtracker.domain.DomainLocation
 import vlnny.base.adapter.BaseViewHolder
+import vlnny.base.ext.round
 
 class LocationHistoryViewHolder private constructor(itemView: View) :
     BaseViewHolder<DomainLocation>(itemView) {
@@ -31,8 +32,8 @@ class LocationHistoryViewHolder private constructor(itemView: View) :
 
     @SuppressLint("SetTextI18n")
     override fun bindView(item: DomainLocation) {
-        latitudeTextView.text = "Latitude: ${item.location.latitude}"
-        longitudeTextView.text = "Longitude: ${item.location.longitude}"
-        dateTextView.text = item.date.toString()
+        latitudeTextView.text = "Lat: ${item.location.latitude.round(5)}"
+        longitudeTextView.text = "Lan: ${item.location.longitude.round(5)}"
+        dateTextView.text = item.date
     }
 }

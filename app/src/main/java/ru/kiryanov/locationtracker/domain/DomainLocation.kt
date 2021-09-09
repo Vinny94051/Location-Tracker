@@ -5,5 +5,5 @@ import java.util.*
 
 data class DomainLocation(
     val location: Location,
-    val date: Date
+    val date: String
 )

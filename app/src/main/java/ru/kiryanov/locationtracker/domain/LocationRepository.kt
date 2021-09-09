@@ -1,8 +1,10 @@
 package ru.kiryanov.locationtracker.domain
 
+import kotlinx.coroutines.flow.Flow
+
 interface LocationRepository {
 
-    suspend fun getLocationList(): List<DomainLocation>
+    fun getLocationList(): Flow<List<DomainLocation>>
 
     suspend fun saveLocation(location: DomainLocation)
 }

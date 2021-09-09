@@ -131,7 +131,7 @@ class LocationService : Service() {
 
         // 0. Get data
         val notificationText = location?.location?.toText() ?: getString(R.string.no_location_text)
-        val titleText = location?.date?.toString() ?: getString(R.string.no_date_text)
+        val titleText = location?.date ?: getString(R.string.no_date_text)
 
         // 1. Create Notification Channel for O+ and beyond devices (26+).
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

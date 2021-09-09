@@ -7,4 +7,10 @@
     <string name="launch_activity">Launch activity</string>
     <string name="no_location_text">Cannot define location</string>
     <string name="no_date_text">Cannot define date</string>
+    <string name="locations_history_title">History</string>
+    <string name="message_now_permission_granted">Permissions now is granted</string>
+    <string name="title_location_usage">Использование локации</string>
+    <string name="permission_alert_message">Для использования приложения мы обязаны следить за вашим местоположением.
+Одобрите использование местоположения.</string>
+    <string name="button_ok">ОК</string>
 </resources>

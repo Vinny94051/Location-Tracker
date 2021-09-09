@@ -17,13 +17,14 @@ import vlnny.base.ext.hideActionBar
 import vlnny.base.ext.showSnack
 import vlnny.base.permissions.PermissionsManager
 // TODO: ("
-//  1. К Бд прикрутить Flow
-//  2. Более видный чек бокс
+//  1. К Бд прикрутить Flow - done
+//  2. Более видный чек бокс - done
 //  3. Преф менеджер мало-мальский
-//  4. Вынести строки в ресурсы
-//  5. Дименсы в ресурсы
+//  4. Вынести строки в ресурсы - done
+//  5. Дименсы в ресурсы - done
 //  6. Вынести create алерта?
 //  7. Пройтись по LocationTracker
+//  8. Преобразовать время и дату - done
 //  ")
 class LocationTrackerActivity : BaseActivity() {
 
@@ -77,11 +78,6 @@ class LocationTrackerActivity : BaseActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        locationService?.unbindService(serviceConnection)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         viewModel.locations.removeObserver(locationsObserver)
@@ -108,7 +104,7 @@ class LocationTrackerActivity : BaseActivity() {
                 createAlertDialog { _, _ ->
                     checkLocationPermissions(this@LocationTrackerActivity)
                     if (isLocationPermissionsGranted(this@LocationTrackerActivity)) {
-                        showSnack(headTextView, "Permissions now is granted")
+                        showSnack(headTextView, getString(R.string.message_now_permission_granted))
                     }
                 }.show()
             }
@@ -131,9 +127,9 @@ class LocationTrackerActivity : BaseActivity() {
 
     private fun createAlertDialog(action: DialogInterface.OnClickListener) =
         AlertDialog.Builder(this)
-            .setTitle("Использование локации")
-            .setMessage("Для использования приложения мы обязаны следить за вашим местоположением. \nОдобрите использование местоположения.")
-            .setPositiveButton("ОК", action)
+            .setTitle(getString(R.string.title_location_usage))
+            .setMessage(getString(R.string.permission_alert_message))
+            .setPositiveButton(getString(R.string.button_ok), action)
             .setCancelable(false)
             .create()
 

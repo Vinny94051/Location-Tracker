@@ -3,11 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_gravity="center"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/default_margin"
-    android:background="@drawable/background_item_location_history"
-    android:padding="@dimen/default_margin"
-    android:elevation="4dp">
+    android:layout_marginBottom="@dimen/margin_4dp"
+    android:elevation="@dimen/margin_4dp">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/longitudeTextView"
@@ -15,6 +14,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/AppCompatTextView.Item.Location.Bold"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/latitudeTextView"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Longitude: 52.2564445" />
 
@@ -22,21 +22,22 @@
         android:id="@+id/latitudeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="@dimen/margin_8dp"
         android:textAppearance="@style/AppCompatTextView.Item.Location.Bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/longitudeTextView"
+        app:layout_constraintStart_toEndOf="@id/longitudeTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/dateTextView"
         tools:text="Latitude: 52.2564445" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="@dimen/margin_8dp"
         android:textAppearance="@style/AppCompatTextView.Item.Location"
+        app:layout_constraintStart_toEndOf="@id/latitudeTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/latitudeTextView"
-        tools:text="Time: 04.06.2020" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Time: 04.06.20200000000" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
