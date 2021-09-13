@@ -1,7 +1,7 @@
 package ru.kiryanov.locationtracker.presentation
 
 import android.annotation.SuppressLint
-import ru.kiryanov.locationtracker.domain.DomainLocation
+import ru.kiryanov.locationtracker.domain.model.DomainLocation
 import ru.kiryanov.locationtracker.utils.location.LocationResult
 import java.text.SimpleDateFormat
 import java.util.*

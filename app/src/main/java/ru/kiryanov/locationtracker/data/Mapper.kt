@@ -3,7 +3,7 @@ package ru.kiryanov.locationtracker.data
 import android.location.Location
 import android.location.LocationManager
 import ru.kiryanov.locationtracker.data.database.entities.LocationEntity
-import ru.kiryanov.locationtracker.domain.DomainLocation
+import ru.kiryanov.locationtracker.domain.model.DomainLocation
 import java.util.*
 
 internal fun LocationEntity.toDomainLocation(): DomainLocation {

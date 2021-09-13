@@ -1,4 +1,4 @@
-package ru.kiryanov.locationtracker.domain
+package ru.kiryanov.locationtracker.domain.model
 
 import android.location.Location
 import java.util.*

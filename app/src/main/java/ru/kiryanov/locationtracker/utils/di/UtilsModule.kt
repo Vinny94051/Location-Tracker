@@ -2,12 +2,14 @@ package ru.kiryanov.locationtracker.utils.di
 
 import dagger.Binds
 import dagger.Module
-import ru.kiryanov.locationtracker.utils.location.LocationTracker
+import ru.kiryanov.locationtracker.domain.location.LocationTracker
 import ru.kiryanov.locationtracker.utils.location.LocationTrackerImpl
-import vlnny.base.permissions.PermissionsManager
+import ru.kiryanov.locationtracker.utils.preference.SharedPreferenceManagerImpl
+import ru.kiryanov.locationtracker.utils.preference.SharedPreferencesManager
 import vlnny.base.permissions.PermissionManagerImpl
+import vlnny.base.permissions.PermissionsManager
 
-@Module
+@Module(includes = [UtilsProvidingModule::class])
 interface UtilsModule {
 
     @Binds
@@ -15,4 +17,7 @@ interface UtilsModule {
 
     @Binds
     fun bindPermissionManager(permissionManagerImpl: PermissionManagerImpl): PermissionsManager
+
+    @Binds
+    fun bindSharedPreferenceManager(sharedPreferenceManagerImpl: SharedPreferenceManagerImpl): SharedPreferencesManager
 }

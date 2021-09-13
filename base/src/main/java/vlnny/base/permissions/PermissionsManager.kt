@@ -11,7 +11,7 @@ interface PermissionsManager {
         const val PERMISSION_REQUEST_CODE_LOCATION = 1111
     }
 
-    fun checkLocationPermissions(activity: Activity)
+    fun requestLocationPermissions(activity: Activity)
 
     /**
      * Returns true if location is enabled

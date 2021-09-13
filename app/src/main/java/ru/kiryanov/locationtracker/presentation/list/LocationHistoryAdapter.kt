@@ -2,9 +2,10 @@ package ru.kiryanov.locationtracker.presentation.list
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import ru.kiryanov.locationtracker.domain.DomainLocation
+import ru.kiryanov.locationtracker.domain.model.DomainLocation
+import javax.inject.Inject
 
-class LocationHistoryAdapter : RecyclerView.Adapter<LocationHistoryViewHolder>() {
+class LocationHistoryAdapter @Inject constructor() : RecyclerView.Adapter<LocationHistoryViewHolder>() {
 
     private var items = listOf<DomainLocation>()
 

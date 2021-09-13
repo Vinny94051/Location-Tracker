@@ -2,8 +2,8 @@ package ru.kiryanov.locationtracker.domain.usecase.di
 
 import dagger.Binds
 import dagger.Module
-import ru.kiryanov.locationtracker.domain.usecase.GetLocationListUseCaseImpl
-import ru.kiryanov.locationtracker.domain.usecase.GetLocationsListUseCase
+import ru.kiryanov.locationtracker.domain.usecase.GetSavedLocationListUseCaseImpl
+import ru.kiryanov.locationtracker.domain.usecase.GetSavedLocationsListUseCase
 import ru.kiryanov.locationtracker.domain.usecase.SaveLocationUseCase
 import ru.kiryanov.locationtracker.domain.usecase.SaveLocationUseCaseImpl
 
@@ -14,5 +14,5 @@ interface UseCaseModule {
     fun bindSaveLocationUseCase(saveLocationUseCaseImpl: SaveLocationUseCaseImpl): SaveLocationUseCase
 
     @Binds
-    fun bindGetLocationsListUseCase(getLocationListUseCaseImpl: GetLocationListUseCaseImpl): GetLocationsListUseCase
+    fun bindGetLocationsListUseCase(getLocationListUseCaseImpl: GetSavedLocationListUseCaseImpl): GetSavedLocationsListUseCase
 }

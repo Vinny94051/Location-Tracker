@@ -10,8 +10,8 @@ import kotlinx.coroutines.withContext
 import ru.kiryanov.locationtracker.data.database.dao.LocationDao
 import ru.kiryanov.locationtracker.data.toDomainLocation
 import ru.kiryanov.locationtracker.data.toLocationEntity
-import ru.kiryanov.locationtracker.domain.DomainLocation
-import ru.kiryanov.locationtracker.domain.LocationRepository
+import ru.kiryanov.locationtracker.domain.model.DomainLocation
+import ru.kiryanov.locationtracker.domain.repository.LocationRepository
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi

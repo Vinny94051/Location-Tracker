@@ -1,106 +1,99 @@
 package ru.kiryanov.locationtracker.utils.location
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import com.google.android.gms.location.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 import com.google.android.gms.location.LocationResult as GoogleLocationResult
-import com.google.android.gms.tasks.Task
-import java.lang.Exception
+import ru.kiryanov.locationtracker.domain.location.LocationTracker
+import ru.kiryanov.locationtracker.utils.toLocationResult
+import java.lang.IllegalStateException
+import java.lang.NullPointerException
 import javax.inject.Inject
 
-class LocationTrackerImpl @Inject constructor(private val context: Context) : LocationTracker {
+class LocationTrackerImpl @Inject constructor(
+    private val fusedLocationClient: FusedLocationProviderClient
+) : LocationTracker {
 
-    companion object {
-        /*
-        * This value should changes depends on device power
-        * */
-        private const val REQUEST_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY
-    }
-
-    private val fusedLocationClient by lazy {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
-
-    private val locationRequest by lazy {
-        LocationRequest.create()
-            .apply {
-                interval = LocationTracker.LOCATION_UPDATES_INTERVAL
-                fastestInterval = LocationTracker.LOCATION_UPDATES_INTERVAL / 4
-                priority = REQUEST_PRIORITY
-            }
-    }
-
-    override fun setLocationListener(listener: (LocationResult) -> Unit) {
-        val locationSettingsRequest = createLocationSettingsRequest()
-
-        val client = LocationServices.getSettingsClient(context)
-        val task = client.checkLocationSettings(locationSettingsRequest)
-
-        task.continueWith { _task -> taskContinueWith(_task, listener) }
-        task.addOnFailureListener { exception -> taskOnFailureAction(exception, listener) }
-    }
+    private val _locationUpdates = MutableSharedFlow<LocationResult>()
+    override val locationUpdates: SharedFlow<LocationResult> =
+        _locationUpdates.asSharedFlow()
 
     private var locationCallback: LocationCallback? = null
+    private var locationService: LocationService? = null
 
-    @SuppressLint("MissingPermission")
-    override fun startLocationUpdates(listener: (LocationResult) -> Unit) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val locationUpdatesFlow: Flow<LocationResult> =
+        callbackFlow {
+            locationCallback = object : LocationCallback() {
+                override fun onLocationResult(location: GoogleLocationResult) {
+                    trySend(location.toLocationResult())
+                }
+            }.apply { requestLocationUpdates(this) }
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: GoogleLocationResult) {
-                super.onLocationResult(locationResult)
-                listener.invoke(LocationResult.Success(location = locationResult.lastLocation))
-            }
+            awaitClose { stopLocationUpdates() }
         }
 
-        locationCallback?.let { notNullCallback ->
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                notNullCallback,
-                Looper.getMainLooper()
-            )
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            val binder = service as LocationService.LocalBinder
+
+            locationService = binder.service
+            locationService?.subscribeLocationUpdates(this@LocationTrackerImpl)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            locationService?.unsubscribeLocationUpdates()
+            locationService = null
+        }
+    }
+
+    override suspend fun startLocationUpdates() {
+        if (locationService == null) {
+            throw NullPointerException("Firstly you must init location tracker with initLocationTracker method.")
+        } else {
+            locationUpdatesFlow.collect { _locationUpdates.emit(it) }
         }
     }
 
     override fun stopLocationUpdates() {
-        locationCallback?.let { notNullCallback ->
-            fusedLocationClient.removeLocationUpdates(notNullCallback)
-        }
+        locationService?.unsubscribeLocationUpdates()
+        locationCallback?.let { fusedLocationClient.removeLocationUpdates(it) }
     }
 
+    override fun initLocationTracker(context: Context) {
+        val serviceIntent = Intent(context, LocationService::class.java)
+        context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
 
     @SuppressLint("MissingPermission")
-    private fun taskContinueWith(
-        task: Task<LocationSettingsResponse>,
-        listener: (LocationResult) -> Unit
-    ) {
-        if (task.isSuccessful) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                listener.invoke(
-                    if (location == null) {
-                        LocationResult.Failure(error = LocationError.Unknown)
-                    } else {
-                        LocationResult.Success(location = location)
-                    }
-                )
+    private fun requestLocationUpdates(onLocationResultCallback: LocationCallback) {
+        val locationRequest = LocationRequest.create()
+            .apply {
+                interval = LOCATION_UPDATES_INTERVAL
+                fastestInterval = LOCATION_UPDATES_INTERVAL / 4
+                priority = REQUEST_PRIORITY
             }
-        }
-    }
 
-    private fun taskOnFailureAction(
-        exception: Exception,
-        listener: (LocationResult) -> Unit
-    ) {
-        Log.e("LocationTrackerImpl: ", exception.message.orEmpty())
-        listener.invoke(
-            LocationResult.Failure(error = LocationError.Unknown)
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            onLocationResultCallback,
+            Looper.getMainLooper()
         )
     }
 
-    private fun createLocationSettingsRequest() =
-        LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest)
-            .setAlwaysShow(true)
-            .build()
+    companion object {
+        private const val REQUEST_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY
+
+        private const val LOCATION_UPDATES_INTERVAL = 10000L
+    }
 }

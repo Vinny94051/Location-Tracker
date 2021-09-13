@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import kotlinx.android.synthetic.main.item_location_history.view.*
 import ru.kiryanov.locationtracker.R
-import ru.kiryanov.locationtracker.domain.DomainLocation
+import ru.kiryanov.locationtracker.domain.model.DomainLocation
 import vlnny.base.adapter.BaseViewHolder
 import vlnny.base.ext.round
 

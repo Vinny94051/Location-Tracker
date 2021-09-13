@@ -1,7 +1,7 @@
 package ru.kiryanov.locationtracker.domain.usecase
 
-import ru.kiryanov.locationtracker.domain.DomainLocation
-import ru.kiryanov.locationtracker.domain.LocationRepository
+import ru.kiryanov.locationtracker.domain.model.DomainLocation
+import ru.kiryanov.locationtracker.domain.repository.LocationRepository
 import javax.inject.Inject
 
 interface SaveLocationUseCase {

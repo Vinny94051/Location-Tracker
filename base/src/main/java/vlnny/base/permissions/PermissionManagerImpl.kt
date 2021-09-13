@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class PermissionManagerImpl @Inject constructor() : PermissionsManager {
 
-    override fun checkLocationPermissions(activity: Activity) {
+    override fun requestLocationPermissions(activity: Activity) {
         ActivityCompat.requestPermissions(
             activity, arrayOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,

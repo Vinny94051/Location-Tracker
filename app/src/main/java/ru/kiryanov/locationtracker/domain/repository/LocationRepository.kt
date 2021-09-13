@@ -1,6 +1,7 @@
-package ru.kiryanov.locationtracker.domain
+package ru.kiryanov.locationtracker.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import ru.kiryanov.locationtracker.domain.model.DomainLocation
 
 interface LocationRepository {
 
